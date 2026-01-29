@@ -1,0 +1,18 @@
+syntax = "proto3"; // protobuf version
+
+package url; // package name 
+
+option go_package = "backend/proto/url"; // Go package option
+
+service URLService { // defines the RPCs associated with URL Service
+    rpc PostURL(LongURL) returns (ShortURL);
+    rpc GetLongURL(ShortURL) returns (LongURL);
+}
+
+message LongURL{
+    string url = 1;
+}
+
+message ShortURL{
+    string alias = 1;
+}

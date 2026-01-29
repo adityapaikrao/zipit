@@ -1,0 +1,21 @@
+syntax = "proto3"; // version naming
+
+package analytics; // Go package name
+
+// relevant imports
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "backend/proto/analytics";
+
+service AnalyticsService{
+    rpc TrackClick(ClickData) returns (google.protobuf.Empty);
+}
+
+// define the message for ClickData
+message ClickData{
+    string alias = 1;
+    string ip_address = 2;
+    google.protobuf.Timestamp timestamp = 3;
+    string user_agent = 4;
+}
