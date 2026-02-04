@@ -2,7 +2,8 @@ package service
 
 import (
 	"context"
-	"fmt"
+	"database/sql"
+	"errors"
 	"zipit/internal/url/repository"
 	"zipit/pkg/shortener"
 )
@@ -14,7 +15,14 @@ type urlSvc struct {
 
 // GetLongURL implements [URLService].
 func (svc *urlSvc) GetLongURL(ctx context.Context, shortCode string) (string, error) {
-	return svc.repo.GetURLByShortCode(ctx, shortCode)
+	longURL, err := svc.repo.GetURLByShortCode(ctx, shortCode)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", ErrNotFound
+		}
+		return "", ErrDatabaseRead
+	}
+	return longURL, nil
 }
 
 // ShortenURL implements [URLService].
@@ -22,12 +30,12 @@ func (svc *urlSvc) ShortenURL(ctx context.Context, longURL string) (string, erro
 	// TODO: implement URL validation
 	// keeping it simple for now...
 	if longURL == "" {
-		return "", fmt.Errorf("Invalid URL: %v", longURL)
+		return "", ErrInvalidURL
 	}
 
 	urlExists, id, err := svc.repo.URLExists(ctx, longURL)
 	if err != nil {
-		return "", fmt.Errorf("error fetching url from database: %w", err)
+		return "", ErrDatabaseRead
 	}
 
 	// create new entry
@@ -37,12 +45,12 @@ func (svc *urlSvc) ShortenURL(ctx context.Context, longURL string) (string, erro
 
 	id, err = svc.repo.CreateURL(ctx, longURL)
 	if err != nil {
-		return "", fmt.Errorf("could not create new url: %w", err)
+		return "", ErrDatabaseWrite
 	}
 	shortCode := svc.shortener.Encode(id)
 	err = svc.repo.SetShortCode(ctx, id, shortCode)
 	if err != nil {
-		return "", fmt.Errorf("error writing shortCode for new url %w", err)
+		return "", ErrDatabaseWrite
 	}
 
 	return shortCode, nil

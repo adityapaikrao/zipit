@@ -1,6 +1,16 @@
 package service
 
-import "context"
+import (
+	"context"
+	"errors"
+)
+
+var (
+	ErrNotFound      = errors.New("url not found")
+	ErrInvalidURL    = errors.New("invalid url")
+	ErrDatabaseRead  = errors.New("error reading from database")
+	ErrDatabaseWrite = errors.New("error writing from database")
+)
 
 // URLService defines the interface for URL shortening operations.
 // It provides methods to create shortened URLs and retrieve original URLs
