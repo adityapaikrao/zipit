@@ -37,7 +37,7 @@ func (pgRepo *postgresRepository) GetURLByShortCode(ctx context.Context, shortCo
 	if err != nil {
 		// sql.ErrNoRows means the query was valid but no matching record exists.
 		if err == sql.ErrNoRows {
-			return "", fmt.Errorf("short code %q does not exist", shortCode)
+			return "", fmt.Errorf("short code %q does not exist: %w", shortCode, sql.ErrNoRows)
 		}
 		return "", fmt.Errorf("failed to retrieve URL: %w", err)
 	}
