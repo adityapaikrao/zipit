@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"testing"
 	"zipit/internal/url/repository"
 	"zipit/pkg/shortener"
@@ -68,6 +70,10 @@ func TestUrlSvc_ShortenURL_EmptyURL(t *testing.T) {
 	_, err := svc.ShortenURL(context.Background(), "")
 	if err == nil {
 		t.Error("Expected error for empty URL, got nil")
+		return
+	}
+	if !errors.Is(err, ErrInvalidURL) {
+		t.Errorf("Expected ErrInvalidURL, got %v", err)
 	}
 }
 
@@ -81,6 +87,10 @@ func TestUrlSvc_ShortenURL_URLExistsError(t *testing.T) {
 	_, err := svc.ShortenURL(context.Background(), "https://example.com")
 	if err == nil {
 		t.Error("Expected error from URLExists, got nil")
+		return
+	}
+	if !errors.Is(err, ErrDatabaseRead) {
+		t.Errorf("Expected ErrDatabaseRead, got %v", err)
 	}
 }
 
@@ -97,6 +107,10 @@ func TestUrlSvc_ShortenURL_CreateURLError(t *testing.T) {
 	_, err := svc.ShortenURL(context.Background(), "https://example.com")
 	if err == nil {
 		t.Error("Expected error from CreateURL, got nil")
+		return
+	}
+	if !errors.Is(err, ErrDatabaseWrite) {
+		t.Errorf("Expected ErrDatabaseWrite, got %v", err)
 	}
 }
 
@@ -116,6 +130,10 @@ func TestUrlSvc_ShortenURL_SetShortCodeError(t *testing.T) {
 	_, err := svc.ShortenURL(context.Background(), "https://example.com")
 	if err == nil {
 		t.Error("Expected error from SetShortCode, got nil")
+		return
+	}
+	if !errors.Is(err, ErrDatabaseWrite) {
+		t.Errorf("Expected ErrDatabaseWrite, got %v", err)
 	}
 }
 
@@ -146,5 +164,26 @@ func TestUrlSvc_GetLongURL_Error(t *testing.T) {
 	_, err := svc.GetLongURL(context.Background(), "abc")
 	if err == nil {
 		t.Error("Expected error from GetURLByShortCode, got nil")
+		return
+	}
+	if !errors.Is(err, ErrDatabaseRead) {
+		t.Errorf("Expected ErrDatabaseRead, got %v", err)
+	}
+}
+
+func TestUrlSvc_GetLongURL_NotFound(t *testing.T) {
+	mockRepo := &repository.MockRepo{
+		GetURLByShortCodeFunc: func(ctx context.Context, shortCode string) (string, error) {
+			return "", sql.ErrNoRows
+		},
+	}
+	svc := NewUrlSvc(mockRepo, shortener.NewBase62Shortener())
+	_, err := svc.GetLongURL(context.Background(), "missing")
+	if err == nil {
+		t.Error("Expected ErrNotFound, got nil")
+		return
+	}
+	if !errors.Is(err, ErrNotFound) {
+		t.Errorf("Expected ErrNotFound, got %v", err)
 	}
 }
