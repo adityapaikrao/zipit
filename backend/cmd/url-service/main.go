@@ -4,6 +4,8 @@ import (
 	"log/slog"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
 
 	urlgrpc "zipit/internal/url/grpc"
 	"zipit/internal/url/repository"
@@ -20,7 +22,7 @@ import (
 )
 
 func main() {
-	// 1. Initialize Infrastucture: Logger, Env vars
+	// 1. Initialize Infrastructure: Logger, Env vars
 	logger.SetLogger()
 	err := godotenv.Load()
 	if err != nil {
@@ -48,19 +50,33 @@ func main() {
 	handler := urlgrpc.NewURLHandler(urlSvc)
 
 	// 4. Start Network Listener
-	lis, err := net.Listen("tcp", ":5051")
+	port := os.Getenv("URL_SERVICE_PORT")
+	if port == "" {
+		port = "5051"
+	}
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		slog.Error("failed to listen", "error", err)
 		os.Exit(1)
 	}
 
+	// sig chan to catch interrupts
+	stopChan := make(chan os.Signal, 1)
+	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
+
 	// 5. Setup and Start gRPC Server
 	server := grpc.NewServer()
 	pb.RegisterURLServiceServer(server, handler)
+	go func() {
+		if err := server.Serve(lis); (err != nil) && (err != grpc.ErrServerStopped) {
+			slog.Error("failed to serve", "error", err)
+			os.Exit(1)
+		}
+	}()
+	slog.Info("url service up & ready!", "port", port)
 
-	slog.Info("url service up & ready!", "port", 5051)
-	if err := server.Serve(lis); err != nil {
-		slog.Error("failed to serve", "error", err)
-		os.Exit(1)
-	}
+	<-stopChan // block until a signal is received
+
+	slog.Info("shutting down gracefully...")
+	server.GracefulStop()
 }
