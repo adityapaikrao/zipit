@@ -19,6 +19,15 @@ type DBConfig struct {
 }
 
 func NewDBConfig() (*DBConfig, error) {
+	// 1. If DATABASE_URL is provided (e.g., in Railway/Neon), use it directly
+	if connURL := os.Getenv("DATABASE_URL"); connURL != "" {
+		return &DBConfig{
+			Driver:        "postgres",
+			ConnectionURL: connURL,
+		}, nil
+	}
+
+	// 2. Fallback to individual components
 	portStr := getEnvOrDefault("DB_PORT", "5432")
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
