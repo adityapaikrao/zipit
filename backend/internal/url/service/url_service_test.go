@@ -77,6 +77,34 @@ func TestUrlSvc_ShortenURL_EmptyURL(t *testing.T) {
 	}
 }
 
+func TestUrlSvc_ShortenURL_InvalidURLs(t *testing.T) {
+	svc := NewUrlSvc(&repository.MockRepo{}, shortener.NewBase62Shortener())
+
+	invalidURLs := []struct {
+		name string
+		url  string
+	}{
+		{"No scheme", "example.com"},
+		{"Javascript scheme", "javascript:alert(1)"},
+		{"Data URI", "data:text/html,<h1>hi</h1>"},
+		{"FTP scheme", "ftp://files.example.com/file.txt"},
+		{"No host", "http://"},
+	}
+
+	for _, tt := range invalidURLs {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := svc.ShortenURL(context.Background(), tt.url)
+			if err == nil {
+				t.Errorf("Expected ErrInvalidURL for %q, got nil", tt.url)
+				return
+			}
+			if !errors.Is(err, ErrInvalidURL) {
+				t.Errorf("Expected ErrInvalidURL for %q, got %v", tt.url, err)
+			}
+		})
+	}
+}
+
 func TestUrlSvc_ShortenURL_URLExistsError(t *testing.T) {
 	mockRepo := &repository.MockRepo{
 		URLExistsFunc: func(ctx context.Context, longURL string) (bool, int64, error) {

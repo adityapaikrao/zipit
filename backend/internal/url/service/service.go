@@ -9,7 +9,7 @@ var (
 	ErrNotFound      = errors.New("url not found")
 	ErrInvalidURL    = errors.New("invalid url")
 	ErrDatabaseRead  = errors.New("error reading from database")
-	ErrDatabaseWrite = errors.New("error writing from database")
+	ErrDatabaseWrite = errors.New("error writing to database")
 )
 
 // URLService defines the interface for URL shortening operations.

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"net/url"
 	"zipit/internal/url/repository"
 	"zipit/pkg/shortener"
 )
@@ -27,9 +28,7 @@ func (svc *urlSvc) GetLongURL(ctx context.Context, shortCode string) (string, er
 
 // ShortenURL implements [URLService].
 func (svc *urlSvc) ShortenURL(ctx context.Context, longURL string) (string, error) {
-	// TODO: implement URL validation
-	// keeping it simple for now...
-	if longURL == "" {
+	if !isValidURL(longURL) {
 		return "", ErrInvalidURL
 	}
 
@@ -56,9 +55,26 @@ func (svc *urlSvc) ShortenURL(ctx context.Context, longURL string) (string, erro
 	return shortCode, nil
 }
 
-func NewUrlSvc(repo repository.URLRepository, shortnener shortener.Shortener) URLService {
+func NewUrlSvc(repo repository.URLRepository, shortener shortener.Shortener) URLService {
 	return &urlSvc{
 		repo:      repo,
-		shortener: shortnener,
+		shortener: shortener,
 	}
+}
+
+func isValidURL(rawURL string) bool {
+	if rawURL == "" {
+		return false
+	}
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return false
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return false
+	}
+	if u.Host == "" {
+		return false
+	}
+	return true
 }
