@@ -23,6 +23,13 @@ func New(h *handler.GatewayHandler) http.Handler {
 		MaxAge:           300,
 	}))
 
+	// Health check endpoint for Railway
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"status":"ok"}`))
+	})
+
 	r.Route("/api", func(r chi.Router) {
 		r.Post("/shorten", h.ShortenURL)
 		r.Get("/{code}", h.ResolveURL)
