@@ -12,10 +12,10 @@ import (
 
 // ShortenURL handles POST /api/shorten
 func (h *GatewayHandler) ShortenURL(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+	// if r.Method != http.MethodPost {
+	// 	w.WriteHeader(http.StatusMethodNotAllowed)
+	// 	return
+	// }
 
 	var req PostURLRequest
 	decoder := json.NewDecoder(r.Body)
