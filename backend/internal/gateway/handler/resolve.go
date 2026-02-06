@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"regexp"
 
 	pb "zipit/gen/url"
 
@@ -10,11 +11,17 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+var validShortCode = regexp.MustCompile(`^[0-9a-zA-Z]{1,12}$`)
+
 // ResolveURL handles GET /api/{code}
 func (h *GatewayHandler) ResolveURL(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
 	if code == "" {
 		writeJSONError(w, http.StatusBadRequest, "short code is required")
+		return
+	}
+	if !validShortCode.MatchString(code) {
+		writeJSONError(w, http.StatusBadRequest, "invalid short code format")
 		return
 	}
 
