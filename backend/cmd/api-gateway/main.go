@@ -22,10 +22,7 @@ import (
 
 func main() {
 	logger.SetLogger()
-	if err := godotenv.Load(); err != nil {
-		slog.Error("could not load env variables", "error", err)
-		os.Exit(1)
-	}
+	_ = godotenv.Load() // Optional: only used in local dev, Railway injects env vars directly
 
 	urlServiceHost := getEnvOrDefault("URL_SERVICE_HOST", "localhost")
 	urlServicePort := getEnvOrDefault("URL_SERVICE_PORT", "5051")

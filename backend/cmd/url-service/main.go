@@ -24,11 +24,7 @@ import (
 func main() {
 	// 1. Initialize Infrastructure: Logger, Env vars
 	logger.SetLogger()
-	err := godotenv.Load()
-	if err != nil {
-		slog.Error("could not load env variables", "error", err)
-		os.Exit(1)
-	}
+	_ = godotenv.Load() // Optional: only used in local dev, Railway injects env vars directly
 
 	// 2. Database Setup
 	dbConfig, err := config.NewDBConfig()
