@@ -67,16 +67,19 @@ func main() {
 	// 5. Setup and Start gRPC Server
 	server := grpc.NewServer()
 	pb.RegisterURLServiceServer(server, handler)
+	errChan := make(chan error, 1)
 	go func() {
 		if err := server.Serve(lis); (err != nil) && (err != grpc.ErrServerStopped) {
-			slog.Error("failed to serve", "error", err)
-			os.Exit(1)
+			errChan <- err
 		}
 	}()
 	slog.Info("url service up & ready!", "port", port)
 
-	<-stopChan // block until a signal is received
-
-	slog.Info("shutting down gracefully...")
+	select {
+	case <-stopChan:
+		slog.Info("shutting down gracefully...")
+	case err := <-errChan:
+		slog.Error("failed to serve", "error", err)
+	}
 	server.GracefulStop()
 }
