@@ -47,6 +47,24 @@ func TestResolveURL(t *testing.T) {
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   `{"error":"failed to resolve url"}`,
 		},
+		{
+			name:           "Empty Code",
+			code:           "",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   `{"error":"short code is required"}`,
+		},
+		{
+			name:           "Invalid Code Format",
+			code:           "../../etc",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   `{"error":"invalid short code format"}`,
+		},
+		{
+			name:           "Code Too Long",
+			code:           "abcdefghijklm",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   `{"error":"invalid short code format"}`,
+		},
 	}
 
 	for _, tt := range tests {

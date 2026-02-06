@@ -46,6 +46,12 @@ func TestShortenURL(t *testing.T) {
 			expectedBody:   `{"short_code":"abcde"}`,
 		},
 		{
+			name:           "Unknown Fields",
+			payload:        `{"long_url": "https://example.com", "extra": "field"}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   `{"error":"invalid JSON payload"}`,
+		},
+		{
 			name:           "Invalid JSON",
 			payload:        `{"long_url": "https://example.com",}`,
 			expectedStatus: http.StatusBadRequest,
