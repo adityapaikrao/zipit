@@ -1,7 +1,7 @@
 include .env
 export
 
-DB_URL_LOCAL := postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSL_MODE)
+DB_URL_LOCAL := $(if $(DATABASE_URL),$(DATABASE_URL),postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSL_MODE))
 
 build_proto:
 	mkdir -p gen
