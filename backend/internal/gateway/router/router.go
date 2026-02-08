@@ -30,10 +30,8 @@ func New(h *handler.GatewayHandler) http.Handler {
 		_, _ = w.Write([]byte(`{"status":"ok"}`))
 	})
 
-	r.Route("/api", func(r chi.Router) {
-		r.Post("/shorten", h.ShortenURL)
-		r.Get("/{code}", h.ResolveURL)
-	})
+	r.Post("/shorten", h.ShortenURL)
+	r.Get("/{code}", h.ResolveURL)
 
 	return r
 }
