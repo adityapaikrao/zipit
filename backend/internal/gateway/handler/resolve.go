@@ -36,5 +36,5 @@ func (h *GatewayHandler) ResolveURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, ResolveResponse{LongURL: resp.GetUrl()})
+	http.Redirect(w, r, resp.GetUrl(), http.StatusFound)
 }
