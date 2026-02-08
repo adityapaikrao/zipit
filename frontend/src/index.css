@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap');
+
+:root {
+  --color-maroon: #800000;
+  --color-nude: #FFE4C4;
+  /* Bisque - a lighter nude */
+  --color-nude-dark: #F5DEB3;
+  /* Wheat - slightly darker nude for contrast */
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+
+  --shadow-hard: 4px 4px 0px 0px var(--color-black);
+  --shadow-hard-hover: 2px 2px 0px 0px var(--color-black);
+  --border-thick: 3px solid var(--color-black);
+
+  --font-heading: 'Bangers', system-ui;
+  --font-body: 'Comic Neue', system-ui;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  background-color: var(--color-nude);
+  color: var(--color-black);
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-heading);
+  letter-spacing: 1px;
+}
+
+.comic-box {
+  background-color: var(--color-white);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  transition: all 0.2s ease-in-out;
+}
+
+.comic-box:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0px 0px var(--color-black);
+}
+
+.comic-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  outline: none;
+  background-color: var(--color-white);
+  transition: all 0.1s;
+}
+
+.comic-input:focus {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-hard-hover);
+}
+
+.comic-button {
+  background-color: var(--color-maroon);
+  color: var(--color-nude);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  font-size: 1.5rem;
+  padding: 10px 24px;
+  transition: all 0.1s;
+  text-transform: uppercase;
+}
+
+.comic-button:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--color-black);
+  background-color: #900000;
+}
+
+.comic-button:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-hard-hover);
+}
+
+.comic-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.layout-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
